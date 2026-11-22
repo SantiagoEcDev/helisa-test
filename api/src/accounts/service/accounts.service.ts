@@ -151,5 +151,31 @@ export class AccountsService {
   return roots;
 }
 
+remove(code: string): void {
+  const accountIndex = this.accounts.findIndex(
+    (account) => account.code === code,
+  );
+
+  if (accountIndex === -1) {
+    throw new NotFoundException(
+      `La cuenta con código ${code} no existe`,
+    );
+  }
+
+  const hasChildren = this.accounts.some(
+    (account) => account.parentCode === code,
+  );
+
+  if (hasChildren) {
+    throw new ConflictException(
+      `No se puede eliminar la cuenta ${code} porque tiene cuentas hijas`,
+    );
+  }
+
+  this.accounts.splice(accountIndex, 1);
+}
+
+
+
 
 }
