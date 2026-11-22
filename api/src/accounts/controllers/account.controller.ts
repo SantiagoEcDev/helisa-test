@@ -2,9 +2,11 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
 } from "@nestjs/common";
 
@@ -28,5 +30,11 @@ export class AccountsController {
   @Get("tree")
   findTree(): AccountTree[] {
     return this.accountsService.findTree();
+  }
+
+  @Delete(":code")
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param("code") code: string): void {
+    this.accountsService.remove(code);
   }
 }
