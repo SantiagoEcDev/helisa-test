@@ -67,3 +67,9 @@ export function apiPost<T, D>(endpoint: string, data: D): Promise<T> {
     body: JSON.stringify(data),
   });
 }
+
+export function apiDelete(endpoint: string): Promise<void> {
+  return request<void>(endpoint, {
+    method: "DELETE",
+  });
+}

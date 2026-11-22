@@ -1,5 +1,9 @@
-import { apiGet, apiPost } from "../../../shared/lib/api";
-import type { Account, AccountNature, AccountTreeNode } from "../types/account.types";
+import { apiDelete, apiGet, apiPost } from "../../../shared/lib/api";
+import type {
+  Account,
+  AccountNature,
+  AccountTreeNode,
+} from "../types/account.types";
 
 export interface CreateAccountInput {
   code: string;
@@ -13,5 +17,9 @@ export const accountsService = {
   },
   createAccount(data: CreateAccountInput): Promise<Account> {
     return apiPost<Account, CreateAccountInput>("/accounts", data);
+  },
+
+  deleteAccount(code: string): Promise<void> {
+    return apiDelete(`/accounts/${encodeURIComponent(code)}`);
   },
 };

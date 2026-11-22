@@ -3,14 +3,24 @@ import { useState } from "react";
 import { AccountTree } from "./features/accounts/components/AccountTree";
 import { CreateAccountForm } from "./features/accounts/components/CreateAccountForm";
 import { useAccountsTree } from "./features/accounts/hooks/useAccountTree";
+import { useDeleteAccount } from "./features/accounts/hooks/useDeleteAccount";
 
 export default function App() {
   const { accounts, isLoading, error, refetch } = useAccountsTree();
+  const { deleteAccount, deletingCode } = useDeleteAccount();
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleAccountCreated = () => {
     setSuccessMessage("La cuenta contable se creó correctamente.");
+    refetch();
+  };
+
+  const handleAccountDeleted = async (code: string): Promise<void> => {
+    await deleteAccount(code);
+
+    setSuccessMessage(`La cuenta ${code} se eliminó correctamente.`);
+
     refetch();
   };
 
@@ -160,7 +170,11 @@ export default function App() {
                 </button>
               </div>
             ) : (
-              <AccountTree accounts={accounts} />
+              <AccountTree
+                accounts={accounts}
+                onDelete={handleAccountDeleted}
+                deletingCode={deletingCode}
+              />
             )}
           </div>
         </section>
