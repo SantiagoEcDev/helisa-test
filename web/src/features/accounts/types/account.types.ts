@@ -1,10 +1,6 @@
 export type AccountNature = "DEBIT" | "CREDIT";
 
-export type AccountLevel =
-  | "CLASS"
-  | "GROUP"
-  | "ACCOUNT"
-  | "SUBACCOUNT";
+export type AccountLevel = "CLASS" | "GROUP" | "ACCOUNT" | "SUBACCOUNT";
 
 export interface Account {
   code: string;
@@ -12,4 +8,8 @@ export interface Account {
   level: AccountLevel;
   parentCode: string | null;
   nature: AccountNature;
+}
+
+export interface AccountTreeNode extends Account {
+  children: AccountTreeNode[];
 }
