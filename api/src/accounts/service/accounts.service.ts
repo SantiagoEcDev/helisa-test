@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import { Account, AccountLevel } from "../interfaces/account.inteface.js";
 import { CreateAccountDto } from "../dto/create-account.dto.js";
+import { AccountTree } from "../interfaces/account-tree.interface.js";
 
 
 
@@ -121,4 +122,34 @@ export class AccountsService {
 
     return code.slice(0, parentLength);
   }
+  findTree(): AccountTree[] {
+  const accountMap = new Map<string, AccountTree>();
+  const roots: AccountTree[] = [];
+
+  for (const account of this.accounts) {
+    accountMap.set(account.code, {
+      ...account,
+      children: [],
+    });
+  }
+
+  for (const account of this.accounts) {
+    const node = accountMap.get(account.code)!;
+
+    if (account.parentCode === null) {
+      roots.push(node);
+      continue;
+    }
+
+    const parent = accountMap.get(account.parentCode);
+
+    if (parent) {
+      parent.children.push(node);
+    }
+  }
+
+  return roots;
+}
+
+
 }
