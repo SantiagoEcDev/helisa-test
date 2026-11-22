@@ -1,14 +1,24 @@
+import { useState } from "react";
+
 import { AccountTree } from "./features/accounts/components/AccountTree";
+import { CreateAccountForm } from "./features/accounts/components/CreateAccountForm";
 import { useAccountsTree } from "./features/accounts/hooks/useAccountTree";
 
 export default function App() {
   const { accounts, isLoading, error, refetch } = useAccountsTree();
 
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleAccountCreated = () => {
+    setSuccessMessage("La cuenta contable se creó correctamente.");
+    refetch();
+  };
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Navegación superior */}
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex h-18 max-w-6xl items-center justify-between px-6">
+        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-xl bg-blue-700 text-xl font-bold text-white">
               A
@@ -31,7 +41,7 @@ export default function App() {
       </header>
 
       {/* Contenido principal */}
-      <main className="mx-auto max-w-6xl px-6 py-10">
+      <main className="mx-auto max-w-7xl px-6 py-10">
         {/* Breadcrumb */}
         <nav
           aria-label="Ubicación actual"
@@ -42,20 +52,21 @@ export default function App() {
           <span className="text-slate-700">Catálogo de cuentas</span>
         </nav>
 
-        {/* Encabezado de la página */}
+        {/* Encabezado */}
         <div className="mb-8 flex flex-wrap items-start justify-between gap-5">
           <div>
-            <div className="mb-3 inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-blue-700 uppercase">
+            <span className="mb-3 inline-flex items-center rounded-md bg-blue-50 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-blue-700 uppercase">
               Plan de cuentas
-            </div>
+            </span>
 
             <h1 className="text-3xl font-bold tracking-tight text-slate-900">
               Catálogo de cuentas
             </h1>
 
-            <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-              Consulta la estructura jerárquica de tus cuentas contables,
-              organizada por clases, grupos, cuentas y subcuentas.
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+              Administra tu catálogo contable, registra nuevas cuentas y
+              consulta su estructura jerárquica por clases, grupos, cuentas y
+              subcuentas.
             </p>
           </div>
 
@@ -69,68 +80,89 @@ export default function App() {
           </button>
         </div>
 
-        {/* Estado del catálogo */}
-        <section aria-label="Contenido del catálogo">
-          {isLoading ? (
-            <div
-              role="status"
-              className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm"
-            >
-              <div className="mx-auto mb-5 h-1.5 w-32 overflow-hidden rounded-full bg-slate-100">
-                <div className="h-full w-1/2 animate-pulse rounded-full bg-blue-500" />
-              </div>
-
-              <h2 className="text-base font-semibold text-slate-800">
-                Cargando catálogo
-              </h2>
-
-              <p className="mt-2 text-sm text-slate-500">
-                Estamos consultando la estructura de tus cuentas.
+        {/* Confirmación de creación */}
+        {successMessage && (
+          <div
+            role="status"
+            className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4"
+          >
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">
+                Cuenta creada
               </p>
+
+              <p className="mt-1 text-sm text-emerald-700">{successMessage}</p>
             </div>
-          ) : error ? (
-            <div
-              role="alert"
-              className="rounded-2xl border border-red-200 bg-white px-6 py-14 text-center shadow-sm"
+
+            <button
+              type="button"
+              onClick={() => setSuccessMessage(null)}
+              aria-label="Cerrar notificación"
+              className="cursor-pointer rounded-lg px-2 py-1 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
             >
-              <span className="mb-4 inline-block rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
-                Error de conexión
-              </span>
+              Cerrar
+            </button>
+          </div>
+        )}
 
-              <h2 className="text-lg font-semibold text-slate-900">
-                No pudimos cargar el catálogo
-              </h2>
+        {/* Formulario y catálogo */}
+        <section
+          aria-label="Administración de cuentas contables"
+          className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[360px_minmax(0,1fr)]"
+        >
+          {/* Formulario de creación */}
+          <div className="min-w-0">
+            <CreateAccountForm onCreated={handleAccountCreated} />
+          </div>
 
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
-                {error}
-              </p>
-
-              <button
-                type="button"
-                onClick={refetch}
-                className="mt-6 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800"
+          {/* Árbol del catálogo */}
+          <div className="min-w-0">
+            {isLoading ? (
+              <div
+                role="status"
+                className="rounded-2xl border border-slate-200 bg-white px-6 py-16 text-center shadow-sm"
               >
-                Intentar nuevamente
-              </button>
-            </div>
-          ) : accounts.length === 0 ? (
-            <div className="rounded-2xl border border-slate-200 bg-white px-6 py-20 text-center shadow-sm">
-              <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-2xl font-bold text-blue-600">
-                A
+                <div className="mx-auto mb-5 h-1.5 w-32 overflow-hidden rounded-full bg-slate-100">
+                  <div className="h-full w-1/2 animate-pulse rounded-full bg-blue-500" />
+                </div>
+
+                <h2 className="text-base font-semibold text-slate-800">
+                  Cargando catálogo
+                </h2>
+
+                <p className="mt-2 text-sm text-slate-500">
+                  Estamos consultando la estructura de tus cuentas.
+                </p>
               </div>
+            ) : error ? (
+              <div
+                role="alert"
+                className="rounded-2xl border border-red-200 bg-white px-6 py-14 text-center shadow-sm"
+              >
+                <span className="mb-4 inline-block rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700">
+                  Error de conexión
+                </span>
 
-              <h2 className="text-lg font-semibold text-slate-900">
-                Tu catálogo está vacío
-              </h2>
+                <h2 className="text-lg font-semibold text-slate-900">
+                  No pudimos cargar el catálogo
+                </h2>
 
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-slate-500">
-                Todavía no hay cuentas contables registradas. Cuando crees tus
-                primeras cuentas, aparecerán aquí organizadas jerárquicamente.
-              </p>
-            </div>
-          ) : (
-            <AccountTree accounts={accounts} />
-          )}
+                <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">
+                  {error}
+                </p>
+
+                <button
+                  type="button"
+                  onClick={refetch}
+                  className="mt-6 cursor-pointer rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-800"
+                >
+                  Intentar nuevamente
+                </button>
+              </div>
+            ) : (
+              <AccountTree accounts={accounts} />
+            )}
+          </div>
         </section>
 
         {/* Pie de página */}
